@@ -119,7 +119,7 @@ def _server_get_historical_data():
     field_list = json_data.pop('field_list')
     start_date = json_data.pop('start_date')
     end_date = json_data.pop('end_date')
-    start_date = dt.datetime.strptime(stard_date, DATE_ISOFORMAT)
+    start_date = dt.datetime.strptime(start_date, DATE_ISOFORMAT)
     end_date = dt.datetime.strptime(end_date, DATE_ISOFORMAT)
 
     data = bloomberg.get_historical_data(ticker_list, field_list,
