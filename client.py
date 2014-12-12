@@ -13,6 +13,19 @@ HEADERS = {'Content-type': 'application/json', 'Accept': 'text/plain'}
 URL_REFERENCE_DATA = "http://{0}:{1}/reference_data"
 URL_HISTORICAL_DATA = "http://{0}:{1}/historical_data"
 
+def _refdata_converter(data):
+    """Convert the deepest value of the JSON response to a DataFrame if it"s
+    possible.
+    """
+    for ticker in data:
+        for field, value in data[ticker].iteritems():
+            if isinstance(value, basestring):
+                try:
+                    data[ticker][field] = pd.read_json(value)
+                except ValueError:
+                    pass
+    return data
+
 def get_reference_data(ticker_list, field_list, host=HOST, port=PORT, **kwargs):
     reference_data_request = {
         'ticker_list': ticker_list,
@@ -24,7 +37,7 @@ def get_reference_data(ticker_list, field_list, host=HOST, port=PORT, **kwargs):
                             data=reference_data_request_js,
                             headers=HEADERS)
     response.raise_for_status()
-    return response.json()
+    return _refdata_converter(response.json())
 
 def get_historical_data(ticker_list, field_list, start_date, end_date,
                         host=HOST, port=PORT, **kwargs):
