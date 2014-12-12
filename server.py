@@ -1,11 +1,13 @@
 import json
 import logging
 import logging.config
+import datetime as dt
+
 import pandas as pd
 
 from flask import Flask, jsonify, request, abort, Response
 
-import bloomberg
+from ezbbg import bloomberg
 
 __author__ = 'eruiz070210'
 
@@ -14,6 +16,7 @@ app = Flask(__name__)
 HOST_DEBUG = 'localhost'
 HOST = '0.0.0.0'
 PORT = 5555
+DATE_ISOFORMAT = "%Y-%m-%d"
 
 LOGGING = {
     'version': 1,
@@ -103,6 +106,30 @@ def _server_get_reference_data():
                     status=200,
                     mimetype="application/json")
 
+@app.route('/historical_data', methods=['GET'])
+def _server_get_historical_data():
+    app.logger.info("Historical data query starting...")
+    json_data = request.get_json()
+    app.logger.info("Historical data query: %s", json_data)
+
+    if json_data is None:
+        abort(400)
+
+    ticker_list = json_data.pop('ticker_list')
+    field_list = json_data.pop('field_list')
+    start_date = json_data.pop('start_date')
+    end_date = json_data.pop('end_date')
+    start_date = dt.datetime.strptime(stard_date, DATE_ISOFORMAT)
+    end_date = dt.datetime.strptime(end_date, DATE_ISOFORMAT)
+
+    data = bloomberg.get_historical_data(ticker_list, field_list,
+                                         start_date, end_date,
+                                         **json_data)
+    app.logger.info("Historical data query ending")
+    return Response(response=json.dumps(data, cls=JSONEncoder),
+                    status=200,
+                    mimetype="application/json")
+
 def _test_get_reference_data():
     app.config['TESTING'] = True
     test_client = app.test_client()
@@ -126,5 +153,5 @@ def main():
 
 if __name__ == '__main__':
     # _test_get_reference_data()
-    # app.run(host=HOST_DEBUG, port=PORT, debug=True)
-    app.run(host=HOST, port=PORT)
+    #app.run(host=HOST_DEBUG, port=PORT, debug=True)
+    main()
