@@ -10,8 +10,10 @@ __author__ = ('eruiz070210', 'dgaraud111714')
 HOST = 'localhost'
 PORT = 5555
 HEADERS = {'Content-type': 'application/json', 'Accept': 'text/plain'}
-URL_REFERENCE_DATA = "http://{0}:{1}/reference_data"
-URL_HISTORICAL_DATA = "http://{0}:{1}/historical_data"
+# ComputerID:PORT or IP_address:PORT only via HTTPS
+URL_EZBBG_ROOT = "https://{0}:{1}"
+URL_REFERENCE_DATA = '/'.join([URL_EZBBG_ROOT, "reference_data"])
+URL_HISTORICAL_DATA = '/'.join([URL_EZBBG_ROOT, "historical_data"])
 
 def _refdata_converter(data):
     """Convert the deepest value of the JSON response to a DataFrame if it"s
@@ -35,7 +37,8 @@ def get_reference_data(ticker_list, field_list, host=HOST, port=PORT, **kwargs):
     reference_data_request_js = json.dumps(reference_data_request)
     response = requests.get(URL_REFERENCE_DATA.format(host, port),
                             data=reference_data_request_js,
-                            headers=HEADERS)
+                            headers=HEADERS,
+                            verify=False)
     response.raise_for_status()
     return _refdata_converter(response.json())
 
@@ -50,7 +53,8 @@ def get_historical_data(ticker_list, field_list, start_date, end_date,
     historical_data_request_js = json.dumps(historical_data_request)
     response = requests.get(URL_HISTORICAL_DATA.format(host, port),
                             data=historical_data_request_js,
-                            headers=HEADERS)
+                            headers=HEADERS,
+                            verify=False)
     response.raise_for_status()
     data_dict_json = response.json()
     return {k: pd.read_json(v) for k,v in data_dict_json.iteritems()}

@@ -164,7 +164,7 @@ def _test_get_reference_data():
     print(pd.read_json(res['SX5E Index']))
 
 def main():
-    app.run(host=HOST, port=PORT)
+    app.run(host=HOST, port=PORT, ssl_context='adhoc')
 
 if __name__ == '__main__':
     # _test_get_reference_data()
