@@ -19,6 +19,7 @@ HOST_DEBUG = 'localhost'
 HOST = '0.0.0.0'
 PORT = 5555
 DATE_ISOFORMAT = "%Y-%m-%d"
+DATETIME_ISOFORMAT = "%Y-%m-%dT%H:%M:%S.%f"
 LOG_DIR = os.path.join(tempfile.gettempdir(), 'ezbbg')
 if not os.path.isdir(LOG_DIR):
     os.makedirs(LOG_DIR)
@@ -75,6 +76,15 @@ LOGGING = {
 
 logging.config.dictConfig(LOGGING)
 
+def isoformat_date_converter(data):
+    """Convert a string in ISO format into a date or a datetime.
+    """
+    try:
+        timestamp = dt.datetime.strptime(data, DATE_ISOFORMAT)
+        return dt.date(timestamp.year, timestamp.month, timestamp.day)
+    except ValueError:
+        return dt.datetime.strptime(data, DATETIME_ISOFORMAT)
+
 
 class JSONEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -124,8 +134,8 @@ def _server_get_historical_data():
     field_list = json_data.pop('field_list')
     start_date = json_data.pop('start_date')
     end_date = json_data.pop('end_date')
-    start_date = dt.datetime.strptime(start_date, DATE_ISOFORMAT)
-    end_date = dt.datetime.strptime(end_date, DATE_ISOFORMAT)
+    start_date = isoformat_date_converter(start_date)
+    end_date = isoformat_date_converter(end_date)
 
     data = bloomberg.get_historical_data(ticker_list, field_list,
                                          start_date, end_date,
