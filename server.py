@@ -19,7 +19,8 @@ HOST_DEBUG = 'localhost'
 HOST = '0.0.0.0'
 PORT = 5555
 DATE_ISOFORMAT = "%Y-%m-%d"
-DATETIME_ISOFORMAT = "%Y-%m-%dT%H:%M:%S.%f"
+DATETIME_ISOFORMAT = "%Y-%m-%dT%H:%M:%S"
+DATETIME_MS_ISOFORMAT = "%Y-%m-%dT%H:%M:%S.%f"
 LOG_DIR = os.path.join(tempfile.gettempdir(), 'ezbbg')
 if not os.path.isdir(LOG_DIR):
     os.makedirs(LOG_DIR)
@@ -78,12 +79,33 @@ logging.config.dictConfig(LOGGING)
 
 def isoformat_date_converter(data):
     """Convert a string in ISO format into a date or a datetime.
+
+      - date ISO format: YYYY-MM-DD
+      - datetime ISO format: YYYY-MM-DDThh:mm:ss
+      - datetime ISO format with microseonds: YYYY-MM-DDThh:mm:ss.ms
+
+    According to the datetime factory, i.e. `datetime(2013,7,13,18,53)` or
+    `datetime.now()`, it can be microseconds or not. Thus, the datetime ISO
+    format can slightly differ.
+
+    Parameters
+    ----------
+
+    data: str
+
+    Return a date or a datetime according to the str input param.
     """
     try:
         timestamp = dt.datetime.strptime(data, DATE_ISOFORMAT)
         return dt.date(timestamp.year, timestamp.month, timestamp.day)
     except ValueError:
-        return dt.datetime.strptime(data, DATETIME_ISOFORMAT)
+        # Try datetime ISO format with and without microseconds
+        try:
+            return dt.datetime.strptime(data, DATETIME_ISOFORMAT)
+        except ValueError:
+            return dt.datetime.strptime(data, DATETIME_MS_ISOFORMAT)
+
+
 
 
 class JSONEncoder(json.JSONEncoder):

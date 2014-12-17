@@ -13,9 +13,20 @@ class ServerUtilityTestCase(unittest.TestCase):
         self.assertEqual(expected, isoformat_date_converter(strdate))
 
     def test_datetime_isoformat_converter(self):
+        # With microseconds
         strdatetime = "1926-05-26T15:23:45.525000"
         expected = datetime(1926, 5, 26, 15, 23, 45, 525000)
         self.assertEqual(expected, isoformat_date_converter(strdatetime))
+        # Without microseonds
+        strdatetime = "1926-05-26T15:02:12"
+        expected = datetime(1926, 5, 26, 15, 02, 12)
+        self.assertEqual(expected, isoformat_date_converter(strdatetime))
+
+    def test_failed_isoformat_converter(self):
+        with self.assertRaises(ValueError) as ctx:
+            isoformat_date_converter("2013/07/17")
+        with self.assertRaises(ValueError) as ctx:
+            isoformat_date_converter("2013/07/17 15h12m13s")
 
 
 if __name__ == '__main__':
