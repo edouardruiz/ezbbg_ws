@@ -1,4 +1,6 @@
+import os
 import json
+import tempfile
 import logging
 import logging.config
 import datetime as dt
@@ -17,6 +19,9 @@ HOST_DEBUG = 'localhost'
 HOST = '0.0.0.0'
 PORT = 5555
 DATE_ISOFORMAT = "%Y-%m-%d"
+LOG_DIR = os.path.join(tempfile.gettempdir(), 'ezbbg')
+if not os.path.isdir(LOG_DIR):
+    os.makedirs(LOG_DIR)
 
 LOGGING = {
     'version': 1,
@@ -40,7 +45,7 @@ LOGGING = {
             'class': 'logging.handlers.RotatingFileHandler',
             'level': 'INFO',
             'formatter': 'simple',
-            'filename': 'logs\info.log',
+            'filename': os.path.join(LOG_DIR, "info.log"),
             'maxBytes': '10485760',  # 10MB
             'backupCount': '20',
             'encoding': 'utf8'
@@ -49,7 +54,7 @@ LOGGING = {
             'class': 'logging.handlers.RotatingFileHandler',
             'level': 'ERROR',
             'formatter': 'simple',
-            'filename': 'logs\errors.log',
+            'filename': os.path.join(LOG_DIR, "errors.log"),
             'maxBytes': '10485760 # 10MB',
             'backupCount': '20',
             'encoding': 'utf8'
