@@ -16,6 +16,7 @@ HEADERS = {'Content-type': 'application/json', 'Accept': 'text/plain'}
 URL_EZBBG_ROOT = "https://{0}:{1}"
 URL_REFERENCE_DATA = '/'.join([URL_EZBBG_ROOT, "reference_data"])
 URL_HISTORICAL_DATA = '/'.join([URL_EZBBG_ROOT, "historical_data"])
+URL_VERSION = '/'.join([URL_EZBBG_ROOT, "version"])
 
 def _refdata_converter(data):
     """Convert the deepest value of the JSON response to a DataFrame if it"s
@@ -29,6 +30,15 @@ def _refdata_converter(data):
                 except ValueError:
                     pass
     return data
+
+def get_server_version(host, port=PORT):
+    """Get the version of ezbbg which runs on the server.
+    """
+    response = requests.get(URL_VERSION.format(host, port),
+                            headers=HEADERS,
+                            verify=False)
+    response.raise_for_status()
+    return response.content
 
 def get_reference_data(ticker_list, field_list, host=HOST, port=PORT, **kwargs):
     reference_data_request = {

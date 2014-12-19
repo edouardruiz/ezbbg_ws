@@ -167,6 +167,11 @@ def _server_get_historical_data():
                     status=200,
                     mimetype="application/json")
 
+@app.route('/version', methods=['GET'])
+def _server_get_version():
+    from ezbbg import __version__
+    return __version__
+
 def _test_get_reference_data():
     app.config['TESTING'] = True
     test_client = app.test_client()
@@ -190,5 +195,5 @@ def main():
 
 if __name__ == '__main__':
     # _test_get_reference_data()
-    #app.run(host=HOST_DEBUG, port=PORT, debug=True)
+    # app.run(host=HOST_DEBUG, port=PORT, ssl_context='adhoc', debug=True)
     main()
