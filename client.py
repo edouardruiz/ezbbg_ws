@@ -4,6 +4,8 @@ import json
 
 import requests
 import pandas as pd
+# Disable 'Unverified HTTPS request' warning.
+requests.packages.urllib3.disable_warnings()
 
 __author__ = ('eruiz070210', 'dgaraud111714')
 
