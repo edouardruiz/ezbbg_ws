@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import os
 import json
 import tempfile
@@ -11,7 +13,7 @@ from flask import Flask, jsonify, request, abort, Response
 
 from ezbbg import bloomberg
 
-__author__ = 'eruiz070210'
+__author__ = ('eruiz070210', 'dgaraud111714')
 
 app = Flask(__name__)
 
@@ -134,8 +136,6 @@ def _server_get_reference_data():
     del json_data['field_list']
 
     reference_data = bloomberg.get_reference_data(ticker_list, field_list, **json_data)
-    # reference_data = {'SX5E Index': pd.DataFrame({'PX_LAST': [1, 2, 3]}),
-    #                   'SPX Index': pd.DataFrame({'PX_LAST': [4, 5, 6]})}
 
     app.logger.info("Reference data query ending")
 
