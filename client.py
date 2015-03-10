@@ -19,7 +19,7 @@ URL_HISTORICAL_DATA = '/'.join([URL_EZBBG_ROOT, "historical_data"])
 URL_VERSION = '/'.join([URL_EZBBG_ROOT, "version"])
 
 def _refdata_converter(data):
-    """Convert the deepest value of the JSON response to a DataFrame if it"s
+    """Convert the deepest value of the JSON response to a DataFrame if it's
     possible.
     """
     for ticker in data:
