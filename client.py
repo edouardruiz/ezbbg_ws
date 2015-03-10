@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import json
+import inspect
+from functools import partial
 
 import requests
 import pandas as pd
@@ -31,7 +33,7 @@ def _refdata_converter(data):
                     pass
     return data
 
-def get_server_version(host, port=PORT):
+def _get_server_version(host, port=PORT):
     """Get the version of ezbbg which runs on the server.
     """
     response = requests.get(URL_VERSION.format(host, port),
@@ -40,7 +42,7 @@ def get_server_version(host, port=PORT):
     response.raise_for_status()
     return response.content
 
-def get_reference_data(ticker_list, field_list, host=HOST, port=PORT, **kwargs):
+def _get_reference_data(ticker_list, field_list, host, port=PORT, **kwargs):
     reference_data_request = {
         'ticker_list': ticker_list,
         'field_list': field_list
@@ -54,8 +56,8 @@ def get_reference_data(ticker_list, field_list, host=HOST, port=PORT, **kwargs):
     response.raise_for_status()
     return _refdata_converter(response.json())
 
-def get_historical_data(ticker_list, field_list, start_date, end_date,
-                        host=HOST, port=PORT, **kwargs):
+def _get_historical_data(ticker_list, field_list, start_date, end_date,
+                        host, port=PORT, **kwargs):
     historical_data_request = {
         'ticker_list': ticker_list,
         'field_list': field_list,
@@ -71,6 +73,25 @@ def get_historical_data(ticker_list, field_list, start_date, end_date,
     data_dict_json = response.json()
     return {k: pd.read_json(v) for k,v in data_dict_json.iteritems()}
 
+def update_host(host, port=PORT):
+    """Update the (host, port) parameters for all HTTP client functions.
+    """
+    frame = inspect.currentframe()
+    try:
+        frame.f_globals["get_reference_data"] = partial(_get_reference_data,
+                                                        host=host, port=host)
+        frame.f_globals["get_historical_data"] = partial(_get_historical_data,
+                                                         host=host, port=port)
+        frame.f_globals["get_server_version"] = partial(_get_server_version,
+                                                        host=host, port=port)
+    finally:
+        del frame
+
+
+get_reference_data = partial(_get_reference_data, host=HOST, port=PORT)
+get_historical_data = partial(_get_historical_data, host=HOST, port=PORT)
+get_server_version = partial(_get_server_version, host=HOST, port=PORT)
+
 
 if __name__ == "__main__":
     from datetime import date
@@ -78,6 +99,6 @@ if __name__ == "__main__":
     #host = 'localhost'
     ticker_list = ['SX5E Index', 'SPX Index']
     field_list = ['PX_OPEN', 'PX_LAST']
-    data = get_reference_data(ticker_list, field_list, host)
     start, end = date(2012, 1, 1), date(2014, 1, 1)
     histo_data = get_historical_data(ticker_list, field_list, start, end, host)
+    data = get_reference_data(ticker_list, field_list, host)
