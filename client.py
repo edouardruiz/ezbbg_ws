@@ -10,6 +10,7 @@ import pandas as pd
 requests.packages.urllib3.disable_warnings()
 
 __author__ = ('eruiz070210', 'dgaraud111714')
+LOCAL_BBG = False
 
 HOST = 'localhost'
 PORT = 5555
