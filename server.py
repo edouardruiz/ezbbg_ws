@@ -107,15 +107,13 @@ def isoformat_date_converter(data):
         except ValueError:
             return dt.datetime.strptime(data, DATETIME_MS_ISOFORMAT)
 
-
-
-
 class JSONEncoder(json.JSONEncoder):
     def default(self, obj):
         if hasattr(obj,'to_json'):
             return obj.to_json()
+        if isinstance(obj, (dt.date, dt.datetime)):
+            return obj.isoformat()
         return json.JSONEncoder.default(self, obj)
-
 
 # region Flask routes
 @app.route('/reference_data', methods=['GET'])
