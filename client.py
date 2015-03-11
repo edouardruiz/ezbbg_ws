@@ -80,7 +80,7 @@ def update_host(host, port=PORT):
     frame = inspect.currentframe()
     try:
         frame.f_globals["get_reference_data"] = partial(_get_reference_data,
-                                                        host=host, port=host)
+                                                        host=host, port=port)
         frame.f_globals["get_historical_data"] = partial(_get_historical_data,
                                                          host=host, port=port)
         frame.f_globals["get_server_version"] = partial(_get_server_version,
