@@ -71,6 +71,8 @@ def _get_historical_data(ticker_list, field_list, start_date, end_date,
                             headers=HEADERS,
                             verify=False)
     response.raise_for_status()
+    if response.text == 'Error':
+        return None
     data_dict_json = response.json()
     return {k: pd.read_json(v) for k,v in data_dict_json.iteritems()}
 
