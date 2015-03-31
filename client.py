@@ -50,7 +50,7 @@ def _get_server_version(host, port=PORT):
 
 def _get_reference_data(ticker_list, field_list, host, port=PORT, **kwargs):
     reference_data_request = {
-        'ticker_list': ticker_list,
+        'ticker_list': [x for x in ticker_list],
         'field_list': field_list
     }
     reference_data_request.update(kwargs)
