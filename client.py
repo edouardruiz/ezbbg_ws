@@ -74,7 +74,12 @@ def _get_historical_data(ticker_list, field_list, start_date, end_date,
     if response.text == 'Error':
         return None
     data_dict_json = response.json()
-    return {k: pd.read_json(v) for k,v in data_dict_json.iteritems()}
+    result = {k: pd.read_json(v) for k,v in data_dict_json.iteritems()}
+    # Add the label 'date' to each index, as the returned DataFrame of the
+    # original 'get_historical_data'.
+    for k, df in result.iteritems():
+        df.index.name = "date"
+    return result
 
 def update_host(host, port=PORT):
     """Update the (host, port) parameters for all HTTP client functions.
