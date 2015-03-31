@@ -127,11 +127,8 @@ def _server_get_reference_data():
     if json_data is None:
         abort(400)
 
-    ticker_list = json_data['ticker_list']
-    field_list = json_data['field_list']
-
-    del json_data['ticker_list']
-    del json_data['field_list']
+    ticker_list = json_data.pop('ticker_list')
+    field_list = json_data.pop('field_list')
 
     reference_data = bloomberg.get_reference_data(ticker_list, field_list, **json_data)
 
