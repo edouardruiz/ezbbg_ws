@@ -5,6 +5,7 @@ import inspect
 from functools import partial
 
 import requests
+from dateutil import parser
 import pandas as pd
 # Disable 'Unverified HTTPS request' warning.
 requests.packages.urllib3.disable_warnings()
@@ -28,6 +29,10 @@ def _refdata_converter(data):
     for ticker in data:
         for field, value in data[ticker].iteritems():
             if isinstance(value, basestring):
+                try:
+                    data[ticker][field] = parser.parse(value).date()
+                except TypeError:
+                    pass
                 try:
                     data[ticker][field] = pd.read_json(value)
                 except ValueError:
