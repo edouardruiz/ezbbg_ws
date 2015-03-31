@@ -31,7 +31,7 @@ def _refdata_converter(data):
             if isinstance(value, basestring):
                 try:
                     data[ticker][field] = parser.parse(value).date()
-                except TypeError:
+                except (ValueError, TypeError):
                     pass
                 try:
                     data[ticker][field] = pd.read_json(value)
