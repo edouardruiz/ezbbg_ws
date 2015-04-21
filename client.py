@@ -21,6 +21,9 @@ URL_EZBBG_ROOT = "https://{0}:{1}"
 URL_REFERENCE_DATA = '/'.join([URL_EZBBG_ROOT, "reference_data"])
 URL_HISTORICAL_DATA = '/'.join([URL_EZBBG_ROOT, "historical_data"])
 URL_VERSION = '/'.join([URL_EZBBG_ROOT, "version"])
+URL_FIELDS_INFO = '/'.join([URL_EZBBG_ROOT, "fields_info"])
+URL_FIELDS = '/'.join([URL_EZBBG_ROOT, "fields"])
+URL_FIELDS_BY_CATEGORY = '/'.join([URL_EZBBG_ROOT, "fields_by_category"])
 
 def _refdata_converter(data):
     """Convert the deepest value of the JSON response to a DataFrame if it's
@@ -86,6 +89,74 @@ def _get_historical_data(ticker_list, field_list, start_date, end_date,
         df.index.name = "date"
     return result
 
+def _get_fields_info(field_list, host, port=PORT, return_field_documentation=True, **kwargs):
+    fields_info_request = {
+        'field_list': field_list,
+        'return_field_documentation': return_field_documentation
+    }
+    fields_info_request.update(kwargs)
+    fields_info_request_js = json.dumps(fields_info_request)
+    response = requests.get(URL_FIELDS_INFO.format(host, port),
+                            data=fields_info_request_js,
+                            headers=HEADERS,
+                            verify=False)
+    response.raise_for_status()
+    return response.json()
+
+def _get_fields(search_string,
+                host,
+                port=PORT,
+                return_field_documentation=True,
+                include_categories=None,
+                include_product_type=None,
+                include_field_type=None,
+                exclude_categories=None,
+                exclude_product_type=None,
+                exclude_field_type=None,
+                **kwargs):
+    fields_request = {
+        'search_string': search_string,
+        'return_field_documentation': return_field_documentation,
+        'include_categories': include_categories,
+        'include_product_type': include_product_type,
+        'include_field_type': include_field_type,
+        'exclude_categories': exclude_categories,
+        'exclude_product_type': exclude_product_type,
+        'exclude_field_type': exclude_field_type
+    }
+    fields_request.update(kwargs)
+    fields_request_js = json.dumps(fields_request)
+    response = requests.get(URL_FIELDS.format(host, port),
+                            data=fields_request_js,
+                            headers=HEADERS,
+                            verify=False)
+    response.raise_for_status()
+    return response.json()
+
+def _get_fields_by_category(search_string,
+                            host,
+                            port=PORT,
+                            return_field_documentation=True,
+                            exclude_categories=None,
+                            exclude_product_type=None,
+                            exclude_field_type=None,
+                            **kwargs):
+    fields_by_category_request = {
+        'search_string': search_string,
+        'return_field_documentation': return_field_documentation,
+        'exclude_categories': exclude_categories,
+        'exclude_product_type': exclude_product_type,
+        'exclude_field_type': exclude_field_type
+    }
+    fields_by_category_request.update(kwargs)
+    fields_by_category_request_js = json.dumps(fields_by_category_request)
+    response = requests.get(URL_FIELDS_BY_CATEGORY.format(host, port),
+                            data=fields_by_category_request_js,
+                            headers=HEADERS,
+                            verify=False)
+    response.raise_for_status()
+    return response.json()
+
 def update_host(host, port=PORT):
     """Update the (host, port) parameters for all HTTP client functions.
     """
@@ -97,6 +168,12 @@ def update_host(host, port=PORT):
                                                          host=host, port=port)
         frame.f_globals["get_server_version"] = partial(_get_server_version,
                                                         host=host, port=port)
+        frame.f_globals["get_fields_info"] = partial(_get_fields_info,
+                                                     host=host, port=port)
+        frame.f_globals["get_fields"] = partial(_get_fields,
+                                                host=host, port=port)
+        frame.f_globals["get_fields_by_category"] = partial(_get_fields_by_category,
+                                                            host=host, port=port)
     finally:
         del frame
 
@@ -104,14 +181,33 @@ def update_host(host, port=PORT):
 get_reference_data = partial(_get_reference_data, host=HOST, port=PORT)
 get_historical_data = partial(_get_historical_data, host=HOST, port=PORT)
 get_server_version = partial(_get_server_version, host=HOST, port=PORT)
+get_fields_info = partial(_get_fields_info, host=HOST, port=PORT)
+get_fields = partial(_get_fields, host=HOST, port=PORT)
+get_fields_by_category = partial(_get_fields_by_category, host=HOST, port=PORT)
 
 
 if __name__ == "__main__":
     from datetime import date
-    host = 'FR09256841D'
+
+    # host = 'FR09256841D'
+    host = 'FR09263537D'
     #host = 'localhost'
+
     ticker_list = ['SX5E Index', 'SPX Index']
     field_list = ['PX_OPEN', 'PX_LAST']
+
     start, end = date(2012, 1, 1), date(2014, 1, 1)
-    histo_data = get_historical_data(ticker_list, field_list, start, end, host)
-    data = get_reference_data(ticker_list, field_list, host)
+
+    update_host(host)
+
+    histo_data = get_historical_data(ticker_list, field_list, start, end)
+    data = get_reference_data(ticker_list, field_list)
+
+    fields_info = get_fields_info(field_list)
+
+    search_string = 'earnings'
+
+    fields_1 = get_fields(search_string, include_categories=["Ratings"])
+    fields_2 = get_fields(search_string, include_categories=["Market"])
+
+    fields_by_category = get_fields_by_category(search_string)
