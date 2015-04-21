@@ -11,7 +11,7 @@ import pandas as pd
 
 from flask import Flask, jsonify, request, abort, Response
 
-from ezbbg import bloomberg
+# from ezbbg import bloomberg
 
 __author__ = ('eruiz070210', 'dgaraud111714')
 
@@ -167,6 +167,90 @@ def _server_get_version():
     from ezbbg import __version__
     return __version__
 
+
+@app.route('/fields_info', methods=['GET'])
+def _server_get_fields_info():
+    app.logger.info("Fields info query starting...")
+    json_data = request.get_json()
+    app.logger.info("Fields info query: %s", json_data)
+
+    if json_data is None:
+        abort(400)
+
+    field_list = json_data.pop('field_list')
+    return_field_documentation = json_data.pop('return_field_documentation', True)
+
+    fields_info = bloomberg.get_fields_info(field_list, return_field_documentation)
+
+    app.logger.info("Fields info query ending")
+
+    return Response(response=json.dumps(fields_info, cls=JSONEncoder),
+                    status=200,
+                    mimetype="application/json")
+
+
+@app.route('/fields', methods=['GET'])
+def _server_search_fields():
+    app.logger.info("Fields query starting...")
+    json_data = request.get_json()
+    app.logger.info("Fields query: %s", json_data)
+
+    if json_data is None:
+        abort(400)
+
+    search_string = json_data.pop('search_string')
+    return_field_documentation = json_data.pop('return_field_documentation', True)
+    include_categories = json_data.pop('include_categories', None)
+    include_product_type = json_data.pop('include_product_type', None)
+    include_field_type = json_data.pop('include_field_type', None)
+    exclude_categories = json_data.pop('exclude_categories', None)
+    exclude_product_type = json_data.pop('exclude_product_type', None)
+    exclude_field_type = json_data.pop('exclude_field_type', None)
+
+    fields = bloomberg.search_fields(search_string,
+                                     return_field_documentation,
+                                     include_categories,
+                                     include_product_type,
+                                     include_field_type,
+                                     exclude_categories,
+                                     exclude_product_type,
+                                     exclude_field_type)
+
+    app.logger.info("Fields query ending")
+
+    return Response(response=json.dumps(fields, cls=JSONEncoder),
+                    status=200,
+                    mimetype="application/json")
+
+
+@app.route('/fields_by_category', methods=['GET'])
+def _server_search_fields_by_category():
+    app.logger.info("Fields by category query starting...")
+    json_data = request.get_json()
+    app.logger.info("Fields by category query: %s", json_data)
+
+    if json_data is None:
+        abort(400)
+
+    search_string = json_data.pop('search_string')
+    return_field_documentation = json_data.pop('return_field_documentation', True)
+    exclude_categories = json_data.pop('exclude_categories', None)
+    exclude_product_type = json_data.pop('exclude_product_type', None)
+    exclude_field_type = json_data.pop('exclude_field_type', None)
+
+    fields = bloomberg.search_fields_by_category(search_string,
+                                                 return_field_documentation,
+                                                 exclude_categories,
+                                                 exclude_product_type,
+                                                 exclude_field_type)
+
+    app.logger.info("Fields by category query ending")
+
+    return Response(response=json.dumps(fields, cls=JSONEncoder),
+                    status=200,
+                    mimetype="application/json")
+
+
 def _test_get_reference_data():
     app.config['TESTING'] = True
     test_client = app.test_client()
@@ -185,10 +269,52 @@ def _test_get_reference_data():
 
     print(pd.read_json(res['SX5E Index']))
 
+
+def _test_get_fields_info():
+    app.config['TESTING'] = True
+    test_client = app.test_client()
+
+    fields_info_request = {
+        'field_list': ['PX_LAST']
+    }
+
+    fields_request_js = json.dumps(fields_info_request)
+
+    response = test_client.get('/fields_info', data=fields_request_js, content_type='application/json')
+
+    res = json.loads(response.data)
+
+    print(res['PX_LAST'])
+
+
+def _test_search_fields_by_category():
+    app.config['TESTING'] = True
+    test_client = app.test_client()
+
+    fields_info_request = {
+        'search_string': 'last',
+        'include_categories': ['Analysis'],
+        'exclude_categories': ['Trading']
+    }
+
+    fields_by_category_request_js = json.dumps(fields_info_request)
+
+    response = test_client.get('/fields_by_category', data=fields_by_category_request_js, content_type='application/json')
+
+    res = json.loads(response.data)
+
+    print(len(res))
+
+
 def main():
     app.run(host=HOST, port=PORT, ssl_context='adhoc')
 
 if __name__ == '__main__':
-    # _test_get_reference_data()
+    from sgilab.remote import remote_debug
+    if remote_debug('FR09263537D'):
+        from ezbbg import bloomberg
+        # _test_get_reference_data()
+        # _test_get_fields_info()
+        _test_search_fields_by_category()
     # app.run(host=HOST_DEBUG, port=PORT, ssl_context='adhoc', debug=True)
-    main()
+    # main()
