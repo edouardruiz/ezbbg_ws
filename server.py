@@ -11,7 +11,7 @@ import pandas as pd
 
 from flask import Flask, jsonify, request, abort, Response
 
-# from ezbbg import bloomberg
+from ezbbg import bloomberg
 
 __author__ = ('eruiz070210', 'dgaraud111714')
 
@@ -310,11 +310,11 @@ def main():
     app.run(host=HOST, port=PORT, ssl_context='adhoc')
 
 if __name__ == '__main__':
-    from sgilab.remote import remote_debug
-    if remote_debug('FR09263537D'):
-        from ezbbg import bloomberg
-        # _test_get_reference_data()
-        # _test_get_fields_info()
-        _test_search_fields_by_category()
+    # from sgilab.remote import remote_debug
+    # if remote_debug('FR09263537D'):
+    #     from ezbbg import bloomberg
+    #     # _test_get_reference_data()
+    #     # _test_get_fields_info()
+    #     _test_search_fields_by_category()
     # app.run(host=HOST_DEBUG, port=PORT, ssl_context='adhoc', debug=True)
-    # main()
+    main()
