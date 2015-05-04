@@ -68,7 +68,7 @@ def _get_reference_data(ticker_list, field_list, host, port=PORT, **kwargs):
 def _get_historical_data(ticker_list, field_list, start_date, end_date,
                         host, port=PORT, **kwargs):
     historical_data_request = {
-        'ticker_list': ticker_list,
+        'ticker_list': [x for x in ticker_list],
         'field_list': field_list,
         'start_date': start_date.isoformat(),
         'end_date': end_date.isoformat()}
