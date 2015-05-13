@@ -109,8 +109,11 @@ def isoformat_date_converter(data):
 
 class JSONEncoder(json.JSONEncoder):
     def default(self, obj):
-        if hasattr(obj,'to_json'):
-            return obj.to_json()
+        if hasattr(obj, 'to_json'):
+            if isinstance(obj, pd.DataFrame):
+                return obj.to_json(date_format='iso')
+            else:
+                return obj.to_json()
         if isinstance(obj, (dt.date, dt.datetime)):
             return obj.isoformat()
         return json.JSONEncoder.default(self, obj)
