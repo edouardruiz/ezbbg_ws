@@ -37,7 +37,8 @@ def _refdata_converter(data):
                 except (ValueError, TypeError):
                     pass
                 try:
-                    data[ticker][field] = pd.read_json(value)
+                    data[ticker][field] = pd.read_json(value).apply(
+                        lambda x: pd.to_datetime(x) if x.dtypes == 'object' else x, axis=0)
                 except ValueError:
                     pass
     return data
