@@ -104,17 +104,17 @@ def _get_fields_info(field_list, host, port=PORT, return_field_documentation=Tru
     response.raise_for_status()
     return response.json()
 
-def _get_fields(search_string,
-                host,
-                port=PORT,
-                return_field_documentation=True,
-                include_categories=None,
-                include_product_type=None,
-                include_field_type=None,
-                exclude_categories=None,
-                exclude_product_type=None,
-                exclude_field_type=None,
-                **kwargs):
+def _search_fields(search_string,
+                   host,
+                   port=PORT,
+                   return_field_documentation=True,
+                   include_categories=None,
+                   include_product_type=None,
+                   include_field_type=None,
+                   exclude_categories=None,
+                   exclude_product_type=None,
+                   exclude_field_type=None,
+                   **kwargs):
     fields_request = {
         'search_string': search_string,
         'return_field_documentation': return_field_documentation,
@@ -134,14 +134,14 @@ def _get_fields(search_string,
     response.raise_for_status()
     return response.json()
 
-def _get_fields_by_category(search_string,
-                            host,
-                            port=PORT,
-                            return_field_documentation=True,
-                            exclude_categories=None,
-                            exclude_product_type=None,
-                            exclude_field_type=None,
-                            **kwargs):
+def _search_fields_by_category(search_string,
+                               host,
+                               port=PORT,
+                               return_field_documentation=True,
+                               exclude_categories=None,
+                               exclude_product_type=None,
+                               exclude_field_type=None,
+                               **kwargs):
     fields_by_category_request = {
         'search_string': search_string,
         'return_field_documentation': return_field_documentation,
@@ -171,10 +171,10 @@ def update_host(host, port=PORT):
                                                         host=host, port=port)
         frame.f_globals["get_fields_info"] = partial(_get_fields_info,
                                                      host=host, port=port)
-        frame.f_globals["get_fields"] = partial(_get_fields,
-                                                host=host, port=port)
-        frame.f_globals["get_fields_by_category"] = partial(_get_fields_by_category,
-                                                            host=host, port=port)
+        frame.f_globals["search_fields"] = partial(_search_fields,
+                                                   host=host, port=port)
+        frame.f_globals["search_fields_by_category"] = partial(_search_fields_by_category,
+                                                               host=host, port=port)
     finally:
         del frame
 
@@ -183,8 +183,8 @@ get_reference_data = partial(_get_reference_data, host=HOST, port=PORT)
 get_historical_data = partial(_get_historical_data, host=HOST, port=PORT)
 get_server_version = partial(_get_server_version, host=HOST, port=PORT)
 get_fields_info = partial(_get_fields_info, host=HOST, port=PORT)
-get_fields = partial(_get_fields, host=HOST, port=PORT)
-get_fields_by_category = partial(_get_fields_by_category, host=HOST, port=PORT)
+search_fields = partial(_search_fields, host=HOST, port=PORT)
+search_fields_by_category = partial(_search_fields_by_category, host=HOST, port=PORT)
 
 
 if __name__ == "__main__":
