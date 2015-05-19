@@ -14,7 +14,7 @@ __author__ = ('eruiz070210', 'dgaraud111714')
 LOCAL_BBG = False
 
 HOST = 'localhost'
-PORT = 5555
+PORT = 6666
 HEADERS = {'Content-type': 'application/json', 'Accept': 'text/plain'}
 # ComputerID:PORT or IP_address:PORT only via HTTPS
 URL_EZBBG_ROOT = "https://{0}:{1}"

@@ -19,7 +19,7 @@ app = Flask(__name__)
 
 HOST_DEBUG = 'localhost'
 HOST = '0.0.0.0'
-PORT = 5555
+PORT = 6666
 DATE_ISOFORMAT = "%Y-%m-%d"
 DATETIME_ISOFORMAT = "%Y-%m-%dT%H:%M:%S"
 DATETIME_MS_ISOFORMAT = "%Y-%m-%dT%H:%M:%S.%f"
