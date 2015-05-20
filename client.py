@@ -10,6 +10,9 @@ import pandas as pd
 # Disable 'Unverified HTTPS request' warning.
 requests.packages.urllib3.disable_warnings()
 
+from ezbbg.ws import git_version
+
+
 __author__ = ('eruiz070210', 'dgaraud111714')
 LOCAL_BBG = False
 
@@ -199,6 +202,20 @@ service_version = partial(_service_version, host=HOST, port=PORT)
 get_fields_info = partial(_get_fields_info, host=HOST, port=PORT)
 search_fields = partial(_search_fields, host=HOST, port=PORT)
 search_fields_by_category = partial(_search_fields_by_category, host=HOST, port=PORT)
+
+
+def check_versions():
+    """Check the version between the client and the server.
+    """
+    remote = get_service_version()
+    local = git_version()
+    if local != remote:
+        print "Web Service versions mismatch between the client and the server"
+        print "Server: '{}'".format(remote)
+        print "Client: '{}'".format(local)
+        return False
+    print "Server/client Versions OK"
+    return True
 
 
 if __name__ == "__main__":
