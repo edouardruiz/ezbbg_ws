@@ -12,6 +12,7 @@ import pandas as pd
 from flask import Flask, jsonify, request, abort, Response
 
 from ezbbg import bloomberg
+from ezbbg.ws import git_version
 
 __author__ = ('eruiz070210', 'dgaraud111714')
 
@@ -165,11 +166,14 @@ def _server_get_historical_data():
                     status=200,
                     mimetype="application/json")
 
-@app.route('/version', methods=['GET'])
-def _server_get_version():
+@app.route('/version/bbg', methods=['GET'])
+def _bbg_version():
     from ezbbg import __version__
     return __version__
 
+@app.route('/version/ws', methods=['GET'])
+def _webs_version():
+    return git_version()
 
 @app.route('/fields_info', methods=['GET'])
 def _server_get_fields_info():
