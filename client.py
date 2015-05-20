@@ -47,7 +47,7 @@ def _refdata_converter(data):
                     pass
     return data
 
-def _bbg_server_version(host, port=PORT):
+def _ezbbg_server_version(host, port=PORT):
     """Get the version of ezbbg which runs on the server.
     """
     response = requests.get(URL_BBG_VERSION.format(host, port),
@@ -181,8 +181,8 @@ def update_host(host, port=PORT):
                                                         host=host, port=port)
         frame.f_globals["get_historical_data"] = partial(_get_historical_data,
                                                          host=host, port=port)
-        frame.f_globals["bbg_server_version"] = partial(_bbg_server_version,
-                                                        host=host, port=port)
+        frame.f_globals["ezbbg_server_version"] = partial(_ezbbg_server_version,
+                                                          host=host, port=port)
         frame.f_globals["service_version"] = partial(_service_version,
                                                      host=host, port=port)
         frame.f_globals["get_fields_info"] = partial(_get_fields_info,
@@ -197,7 +197,7 @@ def update_host(host, port=PORT):
 
 get_reference_data = partial(_get_reference_data, host=HOST, port=PORT)
 get_historical_data = partial(_get_historical_data, host=HOST, port=PORT)
-bbg_server_version = partial(_bbg_server_version, host=HOST, port=PORT)
+ezbbg_server_version = partial(_ezbbg_server_version, host=HOST, port=PORT)
 service_version = partial(_service_version, host=HOST, port=PORT)
 get_fields_info = partial(_get_fields_info, host=HOST, port=PORT)
 search_fields = partial(_search_fields, host=HOST, port=PORT)
