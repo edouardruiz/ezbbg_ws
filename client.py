@@ -20,7 +20,8 @@ HEADERS = {'Content-type': 'application/json', 'Accept': 'text/plain'}
 URL_EZBBG_ROOT = "https://{0}:{1}"
 URL_REFERENCE_DATA = '/'.join([URL_EZBBG_ROOT, "reference_data"])
 URL_HISTORICAL_DATA = '/'.join([URL_EZBBG_ROOT, "historical_data"])
-URL_VERSION = '/'.join([URL_EZBBG_ROOT, "version"])
+URL_BBG_VERSION = '/'.join([URL_EZBBG_ROOT, "version/bbg"])
+URL_WS_VERSION = '/'.join([URL_EZBBG_ROOT, "version/ws"])
 URL_FIELDS_INFO = '/'.join([URL_EZBBG_ROOT, "fields_info"])
 URL_FIELDS = '/'.join([URL_EZBBG_ROOT, "fields"])
 URL_FIELDS_BY_CATEGORY = '/'.join([URL_EZBBG_ROOT, "fields_by_category"])
@@ -43,14 +44,24 @@ def _refdata_converter(data):
                     pass
     return data
 
-def _get_server_version(host, port=PORT):
+def _bbg_server_version(host, port=PORT):
     """Get the version of ezbbg which runs on the server.
     """
-    response = requests.get(URL_VERSION.format(host, port),
+    response = requests.get(URL_BBG_VERSION.format(host, port),
                             headers=HEADERS,
                             verify=False)
     response.raise_for_status()
     return response.content
+
+def _service_version(host, port=PORT):
+    """Get the version of Web Service on server side.
+    """
+    response = requests.get(URL_WS_VERSION.format(host, port),
+                            headers=HEADERS,
+                            verify=False)
+    response.raise_for_status()
+    return response.content
+
 
 def _get_reference_data(ticker_list, field_list, host, port=PORT, **kwargs):
     reference_data_request = {
@@ -167,8 +178,10 @@ def update_host(host, port=PORT):
                                                         host=host, port=port)
         frame.f_globals["get_historical_data"] = partial(_get_historical_data,
                                                          host=host, port=port)
-        frame.f_globals["get_server_version"] = partial(_get_server_version,
+        frame.f_globals["bbg_server_version"] = partial(_bbg_server_version,
                                                         host=host, port=port)
+        frame.f_globals["service_version"] = partial(_service_version,
+                                                     host=host, port=port)
         frame.f_globals["get_fields_info"] = partial(_get_fields_info,
                                                      host=host, port=port)
         frame.f_globals["search_fields"] = partial(_search_fields,
@@ -181,7 +194,8 @@ def update_host(host, port=PORT):
 
 get_reference_data = partial(_get_reference_data, host=HOST, port=PORT)
 get_historical_data = partial(_get_historical_data, host=HOST, port=PORT)
-get_server_version = partial(_get_server_version, host=HOST, port=PORT)
+bbg_server_version = partial(_bbg_server_version, host=HOST, port=PORT)
+service_version = partial(_service_version, host=HOST, port=PORT)
 get_fields_info = partial(_get_fields_info, host=HOST, port=PORT)
 search_fields = partial(_search_fields, host=HOST, port=PORT)
 search_fields_by_category = partial(_search_fields_by_category, host=HOST, port=PORT)
