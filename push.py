@@ -5,7 +5,7 @@ import shutil
 from os import path
 import subprocess
 
-FLIST = ["__init__.py", "__main__.py", "client.py", "server.py"]
+FLIST = ["__init__.py", "__main__.py", "client.py", "server.py", 'version']
 DEST_DIR = r"F:\GEDS-PAR-PRI\Pricing\Protected\ezbbg_ws"
 
 def get_sha1():
@@ -22,14 +22,14 @@ def local_modification():
 
 if __name__ == "__main__":
     import sys
+    # Overwrite the current version
+    print("Create the file 'version' with this message")
+    print(get_sha1())
+    with open("version", "w") as fobj:
+        fobj.writelines(get_sha1())
     if local_modification():
         print("Please commit before pushing files.\nAbort")
         sys.exit(0)
     for fname in FLIST:
         print("Copying '{}'".format(fname))
         shutil.copyfile(fname, path.join(DEST_DIR, fname))
-    # Overwrite the current version
-    print("Create the file 'version' with this message")
-    print(get_sha1())
-    with open(path.join(DEST_DIR, "version"), "w") as fobj:
-        fobj.writelines(get_sha1())
