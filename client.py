@@ -176,7 +176,7 @@ def _search_fields_by_category(search_string,
 def _chain_historical_data(tickers, fields, end_date, host, port,
                            start_date=None, tolerance_in_days=4):
     if not start_date:
-        start_date = end_date - pd.DateOffset(years=5)
+        start_date = (end_date - pd.DateOffset(years=5)).date()
     body = {"tickers": [x for x in tickers],
             'fields': [x for x in fields],
             'start_date': start_date.isoformat(),
