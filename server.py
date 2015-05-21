@@ -12,6 +12,7 @@ import pandas as pd
 from flask import Flask, jsonify, request, abort, Response
 
 from ezbbg import bloomberg
+from ezbbg.helpers import get_and_chain_historical_data
 from ezbbg.ws import git_version
 
 __author__ = ('eruiz070210', 'dgaraud111714')
