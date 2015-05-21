@@ -236,7 +236,7 @@ get_and_chain_historical_data = partial(_chain_historical_data, host=HOST, port=
 def check_versions():
     """Check the version between the client and the server.
     """
-    remote = get_service_version()
+    remote = service_version()
     local = git_version()
     if local != remote:
         print "Web Service versions mismatch between the client and the server"
