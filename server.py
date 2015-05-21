@@ -272,6 +272,7 @@ def _chain_historical_data():
     start_date = json_data.pop('start_date')
     end_date = json_data.pop('end_date')
     tolerance_days = json_data.pop('tolerance_days')
+    start_date = isoformat_date_converter(start_date)
     end_date = isoformat_date_converter(end_date)
     chain_info = {}
     data = get_and_chain_historical_data(tickers, fields, end_date, start_date,
