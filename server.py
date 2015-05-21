@@ -257,6 +257,28 @@ def _server_search_fields_by_category():
                     status=200,
                     mimetype="application/json")
 
+@app.route('/chain_historical_data', methods=['GET'])
+def _chain_historical_data():
+    app.logger.info("Historical chained data query starting...")
+    json_data = request.get_json()
+    app.logger.info("Historical chained data query: %s", json_data)
+
+    if json_data is None:
+        abort(400)
+
+    tickers = json_data.pop('tickers')
+    fields = json_data.pop('fields')
+    start_date = json_data.pop('start_date')
+    end_date = json_data.pop('end_date')
+    tolerance_days = json_data.pop('tolerance_days')
+    end_date = isoformat_date_converter(end_date)
+    chain_info = {}
+    data = get_and_chain_historical_data(tickers, fields, end_date, start_date,
+                                         chain_info, tolerance_days)
+    json_data = json.dumps({'info': chain_info, 'data': data},
+                           cls=JSONEncoder)
+    return Response(response=json_data, status=200, mimetype="application/json")
+
 
 def _test_get_reference_data():
     app.config['TESTING'] = True
