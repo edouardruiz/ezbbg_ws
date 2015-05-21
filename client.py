@@ -28,6 +28,7 @@ URL_WS_VERSION = '/'.join([URL_EZBBG_ROOT, "version/ws"])
 URL_FIELDS_INFO = '/'.join([URL_EZBBG_ROOT, "fields_info"])
 URL_FIELDS = '/'.join([URL_EZBBG_ROOT, "fields"])
 URL_FIELDS_BY_CATEGORY = '/'.join([URL_EZBBG_ROOT, "fields_by_category"])
+URL_CHAIN_HIST = '/'.join([URL_EZBBG_ROOT, "chain_historical_data"])
 
 def _refdata_converter(data):
     """Convert the deepest value of the JSON response to a DataFrame if it's
@@ -172,6 +173,31 @@ def _search_fields_by_category(search_string,
     response.raise_for_status()
     return response.json()
 
+def _chain_historical_data(tickers, fields, end_date, host, port,
+                           start_date=None, tolerance_in_days=4):
+    if not start_date:
+        start_date = end_date - pd.DateOffset(years=5)
+    body = {"tickers": [x for x in tickers],
+            'fields': [x for x in fields],
+            'start_date': start_date.isoformat(),
+            'end_date': end_date.isoformat(),
+            'tolerance_days': tolerance_in_days}
+    resp = requests.get(URL_CHAIN_HIST.format(host, port),
+                        data=json.dumps(body), headers=HEADERS, verify=False)
+    resp.raise_for_status()
+    data_json = resp.json()
+    # Load JSON for historical data
+    hist_data = {k: pd.read_json(v) for k,v in data_json["data"].iteritems()}
+    for k, df in hist_data.iteritems():
+        df.index.name = "date"
+    # Convert dates for the chaining info dict
+    info = data_json["info"]
+    for chain_info in info.values():
+        for couple in chain_info:
+            couple["chaining_start_date"] = pd.Timestamp(couple["chaining_start_date"])
+    return {"info": info,
+            'data': hist_data}
+
 def update_host(host, port=PORT):
     """Update the (host, port) parameters for all HTTP client functions.
     """
@@ -191,6 +217,8 @@ def update_host(host, port=PORT):
                                                    host=host, port=port)
         frame.f_globals["search_fields_by_category"] = partial(_search_fields_by_category,
                                                                host=host, port=port)
+        frame.f_globals["get_and_chain_historical_data"] = partial(_chain_historical_data,
+                                                                   host=host, port=port)
     finally:
         del frame
 
@@ -202,6 +230,7 @@ service_version = partial(_service_version, host=HOST, port=PORT)
 get_fields_info = partial(_get_fields_info, host=HOST, port=PORT)
 search_fields = partial(_search_fields, host=HOST, port=PORT)
 search_fields_by_category = partial(_search_fields_by_category, host=HOST, port=PORT)
+get_and_chain_historical_data = partial(_chain_historical_data, host=HOST, port=PORT)
 
 
 def check_versions():
