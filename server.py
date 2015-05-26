@@ -277,8 +277,7 @@ def _chain_historical_data():
     chain_info = {}
     data = get_and_chain_historical_data(tickers, fields, end_date, start_date,
                                          chain_info, tolerance_days)
-    json_data = json.dumps({'info': chain_info, 'data': data},
-                           cls=JSONEncoder)
+    json_data = json.dumps(data, cls=JSONEncoder)
     return Response(response=json_data, status=200, mimetype="application/json")
 
 
