@@ -274,9 +274,8 @@ def _chain_historical_data():
     tolerance_days = json_data.pop('tolerance_days')
     start_date = isoformat_date_converter(start_date)
     end_date = isoformat_date_converter(end_date)
-    chain_info = {}
     data = get_and_chain_historical_data(tickers, fields, end_date, start_date,
-                                         chain_info, tolerance_days)
+                                         tolerance_in_days=tolerance_days)
     json_data = json.dumps(data, cls=JSONEncoder)
     return Response(response=json_data, status=200, mimetype="application/json")
 
