@@ -48,7 +48,7 @@ def _refdata_converter(data):
                     pass
     return data
 
-def _ezbbg_server_version(host, port=PORT):
+def _ezbbg_server_version(host, port):
     """Get the version of ezbbg which runs on the server.
     """
     response = requests.get(URL_BBG_VERSION.format(host, port),
@@ -57,7 +57,7 @@ def _ezbbg_server_version(host, port=PORT):
     response.raise_for_status()
     return response.content
 
-def _service_version(host, port=PORT):
+def _service_version(host, port):
     """Get the version of Web Service on server side.
     """
     response = requests.get(URL_WS_VERSION.format(host, port),
@@ -67,7 +67,7 @@ def _service_version(host, port=PORT):
     return response.content
 
 
-def _get_reference_data(ticker_list, field_list, host, port=PORT, **kwargs):
+def _get_reference_data(ticker_list, field_list, host, port, **kwargs):
     reference_data_request = {
         'ticker_list': [x for x in ticker_list],
         'field_list': field_list
@@ -82,7 +82,7 @@ def _get_reference_data(ticker_list, field_list, host, port=PORT, **kwargs):
     return _refdata_converter(response.json())
 
 def _get_historical_data(ticker_list, field_list, start_date, end_date,
-                        host, port=PORT, **kwargs):
+                        host, port, **kwargs):
     historical_data_request = {
         'ticker_list': [x for x in ticker_list],
         'field_list': field_list,
@@ -106,7 +106,7 @@ def _get_historical_data(ticker_list, field_list, start_date, end_date,
         df.sort_index(inplace=True)
     return result
 
-def _get_fields_info(field_list, host, port=PORT, return_field_documentation=True, **kwargs):
+def _get_fields_info(field_list, host, port, return_field_documentation=True, **kwargs):
     fields_info_request = {
         'field_list': field_list,
         'return_field_documentation': return_field_documentation
@@ -122,7 +122,7 @@ def _get_fields_info(field_list, host, port=PORT, return_field_documentation=Tru
 
 def _search_fields(search_string,
                    host,
-                   port=PORT,
+                   port,
                    return_field_documentation=True,
                    include_categories=None,
                    include_product_type=None,
@@ -152,7 +152,7 @@ def _search_fields(search_string,
 
 def _search_fields_by_category(search_string,
                                host,
-                               port=PORT,
+                               port,
                                return_field_documentation=True,
                                exclude_categories=None,
                                exclude_product_type=None,
