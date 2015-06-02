@@ -103,6 +103,7 @@ def _get_historical_data(ticker_list, field_list, start_date, end_date,
     # original 'get_historical_data'.
     for k, df in result.iteritems():
         df.index.name = "date"
+        df.sort_index(inplace=True)
     return result
 
 def _get_fields_info(field_list, host, port=PORT, return_field_documentation=True, **kwargs):
