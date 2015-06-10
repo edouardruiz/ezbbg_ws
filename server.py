@@ -7,6 +7,7 @@ import logging
 import logging.config
 import datetime as dt
 
+import numpy as np
 import pandas as pd
 
 from flask import Flask, jsonify, request, abort, Response
@@ -118,6 +119,8 @@ class JSONEncoder(json.JSONEncoder):
                 return obj.to_json()
         if isinstance(obj, (dt.date, dt.datetime)):
             return obj.isoformat()
+        if isinstance(obj, (np.datetime64, pd.Timestamp)):
+            return pd.to_datetime(obj).isoformat()
         return json.JSONEncoder.default(self, obj)
 
 # region Flask routes

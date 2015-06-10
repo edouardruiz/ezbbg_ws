@@ -5,6 +5,7 @@ import inspect
 from functools import partial
 
 import requests
+import numpy as np
 from dateutil import parser
 import pandas as pd
 # Disable 'Unverified HTTPS request' warning.
@@ -38,7 +39,7 @@ def _refdata_converter(data):
         for field, value in data[ticker].iteritems():
             if isinstance(value, basestring):
                 try:
-                    data[ticker][field] = parser.parse(value).date()
+                    data[ticker][field] = np.datetime64(parser.parse(value).date())
                 except (ValueError, TypeError):
                     pass
                 try:
