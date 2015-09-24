@@ -20,6 +20,7 @@ LOCAL_BBG = False
 HOST = 'localhost'
 PORT = 6666
 HEADERS = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+DEFAULT_TIMEOUT = 30
 # ComputerID:PORT or IP_address:PORT only via HTTPS
 URL_EZBBG_ROOT = "https://{0}:{1}"
 URL_REFERENCE_DATA = '/'.join([URL_EZBBG_ROOT, "reference_data"])
@@ -73,14 +74,17 @@ def _get_reference_data(ticker_list, field_list, host, port, **kwargs):
         'ticker_list': [x for x in ticker_list],
         'field_list': field_list
     }
+    timeout = kwargs.pop('timeout', DEFAULT_TIMEOUT)
     reference_data_request.update(kwargs)
     reference_data_request_js = json.dumps(reference_data_request)
     response = requests.get(URL_REFERENCE_DATA.format(host, port),
                             data=reference_data_request_js,
                             headers=HEADERS,
-                            verify=False)
+                            verify=False,
+                            timeout=timeout)
     response.raise_for_status()
     return _refdata_converter(response.json())
+
 
 def _get_historical_data(ticker_list, field_list, start_date, end_date,
                         host, port, **kwargs):
@@ -89,12 +93,14 @@ def _get_historical_data(ticker_list, field_list, start_date, end_date,
         'field_list': field_list,
         'start_date': start_date.isoformat(),
         'end_date': end_date.isoformat()}
+    timeout = kwargs.pop('timeout', DEFAULT_TIMEOUT)
     historical_data_request.update(kwargs)
     historical_data_request_js = json.dumps(historical_data_request)
     response = requests.get(URL_HISTORICAL_DATA.format(host, port),
                             data=historical_data_request_js,
                             headers=HEADERS,
-                            verify=False)
+                            verify=False,
+                            timeout=timeout)
     response.raise_for_status()
     if response.text == 'Error':
         return None
@@ -107,19 +113,23 @@ def _get_historical_data(ticker_list, field_list, start_date, end_date,
         df.sort_index(inplace=True)
     return result
 
+
 def _get_fields_info(field_list, host, port, return_field_documentation=True, **kwargs):
     fields_info_request = {
         'field_list': field_list,
         'return_field_documentation': return_field_documentation
     }
+    timeout = kwargs.pop('timeout', DEFAULT_TIMEOUT)
     fields_info_request.update(kwargs)
     fields_info_request_js = json.dumps(fields_info_request)
     response = requests.get(URL_FIELDS_INFO.format(host, port),
                             data=fields_info_request_js,
                             headers=HEADERS,
-                            verify=False)
+                            verify=False,
+                            timeout=timeout)
     response.raise_for_status()
     return response.json()
+
 
 def _search_fields(search_string,
                    host,
@@ -142,14 +152,17 @@ def _search_fields(search_string,
         'exclude_product_type': exclude_product_type,
         'exclude_field_type': exclude_field_type
     }
+    timeout = kwargs.pop('timeout', DEFAULT_TIMEOUT)
     fields_request.update(kwargs)
     fields_request_js = json.dumps(fields_request)
     response = requests.get(URL_FIELDS.format(host, port),
                             data=fields_request_js,
                             headers=HEADERS,
-                            verify=False)
+                            verify=False,
+                            timeout=timeout)
     response.raise_for_status()
     return response.json()
+
 
 def _search_fields_by_category(search_string,
                                host,
@@ -166,14 +179,17 @@ def _search_fields_by_category(search_string,
         'exclude_product_type': exclude_product_type,
         'exclude_field_type': exclude_field_type
     }
+    timeout = kwargs.pop('timeout', DEFAULT_TIMEOUT)
     fields_by_category_request.update(kwargs)
     fields_by_category_request_js = json.dumps(fields_by_category_request)
     response = requests.get(URL_FIELDS_BY_CATEGORY.format(host, port),
                             data=fields_by_category_request_js,
                             headers=HEADERS,
-                            verify=False)
+                            verify=False,
+                            timeout=timeout)
     response.raise_for_status()
     return response.json()
+
 
 def _chain_historical_data(tickers, fields, end_date, host, port,
                            start_date=None, tolerance_in_days=4):
@@ -199,6 +215,7 @@ def _chain_historical_data(tickers, fields, end_date, host, port,
             couple["chaining_start_date"] = pd.Timestamp(couple["chaining_start_date"])
     return {"info": info,
             'data': hist_data}
+
 
 def update_host(host, port=PORT):
     """Update the (host, port) parameters for all HTTP client functions.
@@ -270,7 +287,7 @@ if __name__ == "__main__":
 
     search_string = 'earnings'
 
-    fields_1 = get_fields(search_string, include_categories=["Ratings"])
-    fields_2 = get_fields(search_string, include_categories=["Market"])
+    fields_1 = search_fields(search_string, include_categories=["Ratings"])
+    fields_2 = search_fields(search_string, include_categories=["Market"])
 
-    fields_by_category = get_fields_by_category(search_string)
+    fields_by_category = search_fields_by_category(search_string)
