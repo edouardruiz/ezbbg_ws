@@ -3,7 +3,7 @@
 import json
 import inspect
 from functools import partial
-
+from ast import literal_eval
 import requests
 import numpy as np
 from dateutil import parser
@@ -32,23 +32,28 @@ URL_FIELDS = '/'.join([URL_EZBBG_ROOT, "fields"])
 URL_FIELDS_BY_CATEGORY = '/'.join([URL_EZBBG_ROOT, "fields_by_category"])
 URL_CHAIN_HIST = '/'.join([URL_EZBBG_ROOT, "chain_historical_data"])
 
+
 def _refdata_converter(data):
     """Convert the deepest value of the JSON response to a DataFrame if it's
     possible.
     """
-    for ticker in data:
-        for field, value in data[ticker].iteritems():
-            if isinstance(value, basestring):
+    for dictionary in data.itervalues():
+        for key, unicode_str in dictionary.iteritems():
+            if isinstance(unicode_str, basestring):
                 try:
-                    data[ticker][field] = np.datetime64(parser.parse(value).date())
+                    dictionary[key] = np.datetime64(parser.parse(dictionary[key]).date())
                 except (ValueError, TypeError):
                     pass
                 try:
-                    data[ticker][field] = pd.read_json(value).apply(
+                    dictionary[key] = pd.read_json(dictionary[key]).apply(
                         lambda x: pd.to_datetime(x) if x.dtypes == 'object' else x, axis=0)
                 except ValueError:
                     pass
-    return data
+                try:
+                    dictionary[key] = pd.DataFrame.from_dict(literal_eval(unicode_str))
+                except ValueError:
+                    pass
+
 
 def _ezbbg_server_version(host, port):
     """Get the version of ezbbg which runs on the server.
