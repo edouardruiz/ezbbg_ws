@@ -16,6 +16,21 @@ from ezbbg import bloomberg
 from ezbbg.helpers import get_and_chain_historical_data
 from ezbbg.ws import git_version
 
+
+# check if session is locked - Win7
+import ctypes
+user32 = ctypes.windll.User32
+OpenDesktop = user32.OpenDesktopA
+SwitchDesktop = user32.SwitchDesktop
+DESKTOP_SWITCHDESKTOP = 0x0100
+
+def is_session_locked():
+    hDesktop = OpenDesktop ("default", 0, False, DESKTOP_SWITCHDESKTOP)
+    test = SwitchDesktop (hDesktop)
+    return not test
+
+
+
 __author__ = ('eruiz070210', 'dgaraud111714')
 
 app = Flask(__name__)
@@ -132,6 +147,9 @@ def _server_get_reference_data():
 
     app.logger.info("Reference data query: %s", json_data)
 
+    if is_session_locked():
+        abort(500)
+
     if json_data is None:
         abort(400)
 
@@ -151,6 +169,9 @@ def _server_get_historical_data():
     app.logger.info("Historical data query starting...")
     json_data = request.get_json()
     app.logger.info("Historical data query: %s", json_data)
+
+    if is_session_locked():
+        abort(500)
 
     if json_data is None:
         abort(400)
@@ -185,6 +206,9 @@ def _server_get_fields_info():
     json_data = request.get_json()
     app.logger.info("Fields info query: %s", json_data)
 
+    if is_session_locked():
+        abort(500)
+
     if json_data is None:
         abort(400)
 
@@ -205,6 +229,9 @@ def _server_search_fields():
     app.logger.info("Fields query starting...")
     json_data = request.get_json()
     app.logger.info("Fields query: %s", json_data)
+
+    if is_session_locked():
+        abort(500)
 
     if json_data is None:
         abort(400)
@@ -240,6 +267,9 @@ def _server_search_fields_by_category():
     json_data = request.get_json()
     app.logger.info("Fields by category query: %s", json_data)
 
+    if is_session_locked():
+        abort(500)
+
     if json_data is None:
         abort(400)
 
@@ -266,6 +296,9 @@ def _chain_historical_data():
     app.logger.info("Historical chained data query starting...")
     json_data = request.get_json()
     app.logger.info("Historical chained data query: %s", json_data)
+
+    if is_session_locked():
+        abort(500)
 
     if json_data is None:
         abort(400)
