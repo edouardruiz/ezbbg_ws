@@ -51,8 +51,9 @@ def _refdata_converter(data):
                     pass
                 try:
                     dictionary[key] = pd.DataFrame.from_dict(literal_eval(unicode_str))
-                except ValueError:
+                except:
                     pass
+    return data
 
 
 def _ezbbg_server_version(host, port):
