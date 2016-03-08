@@ -35,6 +35,13 @@ __author__ = ('eruiz070210', 'dgaraud111714')
 
 app = Flask(__name__)
 
+# env var must be set to '1' if the server runs as a service
+EZBBG_SERVICE = os.environ.get('EZBBG_SERVICE', None)
+
+def is_server_run_as_a_service():
+    return EZBBG_SERVICE=='1'
+
+
 HOST_DEBUG = 'localhost'
 HOST = '0.0.0.0'
 PORT = 6666
@@ -147,7 +154,7 @@ def _server_get_reference_data():
 
     app.logger.info("Reference data query: %s", json_data)
 
-    if is_session_locked():
+    if is_session_locked() and not is_server_run_as_a_service():
         abort(500)
 
     if json_data is None:
@@ -170,7 +177,7 @@ def _server_get_historical_data():
     json_data = request.get_json()
     app.logger.info("Historical data query: %s", json_data)
 
-    if is_session_locked():
+    if is_session_locked() and not is_server_run_as_a_service():
         abort(500)
 
     if json_data is None:
@@ -206,7 +213,7 @@ def _server_get_fields_info():
     json_data = request.get_json()
     app.logger.info("Fields info query: %s", json_data)
 
-    if is_session_locked():
+    if is_session_locked() and not is_server_run_as_a_service():
         abort(500)
 
     if json_data is None:
@@ -230,7 +237,7 @@ def _server_search_fields():
     json_data = request.get_json()
     app.logger.info("Fields query: %s", json_data)
 
-    if is_session_locked():
+    if is_session_locked() and not is_server_run_as_a_service():
         abort(500)
 
     if json_data is None:
@@ -267,7 +274,7 @@ def _server_search_fields_by_category():
     json_data = request.get_json()
     app.logger.info("Fields by category query: %s", json_data)
 
-    if is_session_locked():
+    if is_session_locked() and not is_server_run_as_a_service():
         abort(500)
 
     if json_data is None:
@@ -297,7 +304,7 @@ def _chain_historical_data():
     json_data = request.get_json()
     app.logger.info("Historical chained data query: %s", json_data)
 
-    if is_session_locked():
+    if is_session_locked() and not is_server_run_as_a_service():
         abort(500)
 
     if json_data is None:
