@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 
+from future.utils import iteritems, itervalues
+from past.builtins import basestring
+
 import json
 import inspect
 from functools import partial
@@ -37,8 +40,8 @@ def _refdata_converter(data):
     """Convert the deepest value of the JSON response to a DataFrame if it's
     possible.
     """
-    for dictionary in data.itervalues():
-        for key, unicode_str in dictionary.iteritems():
+    for dictionary in itervalues(data):
+        for key, unicode_str in iteritems(dictionary):
             if isinstance(unicode_str, basestring):
                 try:
                     dictionary[key] = np.datetime64(parser.parse(dictionary[key]).date())
@@ -111,10 +114,10 @@ def _get_historical_data(ticker_list, field_list, start_date, end_date,
     if response.text == 'Error':
         return None
     data_dict_json = response.json()
-    result = {k: pd.read_json(v) for k,v in data_dict_json.iteritems()}
+    result = {k: pd.read_json(v) for k,v in iteritems(data_dict_json)}
     # Add the label 'date' to each index, as the returned DataFrame of the
     # original 'get_historical_data'.
-    for k, df in result.iteritems():
+    for k, df in iteritems(result):
         df.index.name = "date"
         df.sort_index(inplace=True)
     return result
@@ -211,8 +214,8 @@ def _chain_historical_data(tickers, fields, end_date, host, port,
     resp.raise_for_status()
     data_json = resp.json()
     # Load JSON for historical data
-    hist_data = {k: pd.read_json(v) for k,v in data_json["data"].iteritems()}
-    for k, df in hist_data.iteritems():
+    hist_data = {k: pd.read_json(v) for k,v in iteritems(data_json["data"])}
+    for k, df in iteritems(hist_data):
         df.index.name = "date"
     # Convert dates for the chaining info dict
     info = data_json["info"]
@@ -264,11 +267,11 @@ def check_versions():
     remote = service_version()
     local = git_version()
     if local != remote:
-        print "Web Service versions mismatch between the client and the server"
-        print "Server: '{}'".format(remote)
-        print "Client: '{}'".format(local)
+        print("Web Service versions mismatch between the client and the server")
+        print("Server: '{}'".format(remote))
+        print("Client: '{}'".format(local))
         return False
-    print "Server/client Versions OK"
+    print("Server/client Versions OK")
     return True
 
 
