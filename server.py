@@ -383,3 +383,7 @@ def main(debug=False):
         app.run(host=HOST_DEBUG, port=PORT, ssl_context='adhoc')
     else:
         app.run(host=HOST, port=PORT, ssl_context='adhoc')
+
+
+if __name__ == '__main__':
+    main()
