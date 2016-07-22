@@ -11,7 +11,7 @@ DEST_DIR = r"F:\GEDS-PAR-PRI\Pricing\Protected\ezbbg_ws"
 def get_sha1():
     fmt = '"%h [%ad] %s - %an"'
     cmd = ['git', 'log', '--format='+ fmt, "--date=short", "-n", "1"]
-    return subprocess.check_output(cmd).replace('"', '').strip()
+    return subprocess.getoutput(cmd).replace('"', '').strip()
 
 def local_modification():
     cmd = ["git", 'status', '-s', '-uno']
